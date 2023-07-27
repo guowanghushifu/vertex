@@ -619,6 +619,5 @@ class Client {
       await this.client.recheckTorrent(this.clientUrl, this.cookie, hash);
     }
   }
-
 }
 module.exports = Client;

@@ -147,7 +147,7 @@ exports.resumeTorrent = async (clientUrl, cookie, hash) => {
   return res;
 };
 
-//效验种子
+// 效验种子
 exports.recheckTorrent = async (clientUrl, cookie, hash) => {
   const message = {
     url: clientUrl + '/api/v2/torrents/recheck',

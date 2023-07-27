@@ -413,7 +413,7 @@ class Rss {
 
       // RSS任务名包含"test"开启首选下载器调整，寻找可用下载器里有相同大小的种子，并将此下载器设为首选
       let sizeClient;
-      if (this._rss.alias.includes('test')) {
+      if (this._rss.alias.includes('[O]')) {
         for (const client of availableClients) {
           for (const _torrent of client.maindata.torrents) {
             if (+_torrent.size === +torrent.size) {
