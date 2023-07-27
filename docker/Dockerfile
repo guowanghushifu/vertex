@@ -5,9 +5,9 @@ LABEL build_from="https://github.com/vertex-app/vertex"
 ENV TZ=Asia/Shanghai
 RUN \
   apk add --no-cache gcc g++ python3 git cmake make npm libc-dev && \
-  git clone https://github.com/vertex-app/vertex.git /app/vertex && \
+  git clone https://github.com/guowanghushifu/vertex.git /app/vertex && \
   cd /app/vertex && \
-  git checkout COMMIT_ID && \
+  git checkout head && \
   rm .git webui -rf && \
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm i --save && \
   mkdir /vertex && \
