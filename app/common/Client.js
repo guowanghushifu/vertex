@@ -614,7 +614,6 @@ class Client {
     return [];
   }
 
-  //校验种子
   async recheckTorrent (hash) {
     if (this._client.type === 'qBittorrent') {
       await this.client.recheckTorrent(this.clientUrl, this.cookie, hash);

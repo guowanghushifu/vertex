@@ -411,7 +411,7 @@ class Rss {
         continue;
       }
 
-      //RSS任务名包含"test"开启首选下载器调整，寻找可用下载器里有相同大小的种子，并将此下载器设为首选
+      // RSS任务名包含"test"开启首选下载器调整，寻找可用下载器里有相同大小的种子，并将此下载器设为首选
       let sizeClient;
       if (this._rss.alias.includes('test')) {
         for (const client of availableClients) {
@@ -427,14 +427,13 @@ class Rss {
         }
       }
       let selectClient;
-      if (sizeClient){
+      if (sizeClient) {
         selectClient = sizeClient;
-        //logger.info(`首选下载器调整,种子分类：${torrent.category},原下载器:${firstClient.alias},新下载器sizeClient,种子名称：${sizeClient.alias}`);
-        logger.sc(this._rss.alias,`首选下载器调整,原下载器:${firstClient.alias},新下载器:${sizeClient.alias} \n 种子名称：${torrent.name}\n`);
-      }else{
+        // logger.info(`首选下载器调整,种子分类：${torrent.category},原下载器:${firstClient.alias},新下载器sizeClient,种子名称：${sizeClient.alias}`);
+        logger.sc(this._rss.alias, `首选下载器调整,原下载器:${firstClient.alias},新下载器:${sizeClient.alias} \n 种子名称：${torrent.name}\n`);
+      } else {
         selectClient = firstClient;
       }
-
 
       if (!selectClient) {
         await util.runRecord('INSERT INTO torrents (hash, name, size, rss_id, link, record_time, record_type, record_note) values (?, ?, ?, ?, ?, ?, ?, ?)',
