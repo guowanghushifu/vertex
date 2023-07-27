@@ -410,7 +410,33 @@ class Rss {
         await this.ntf.rejectTorrent(this._rss, undefined, torrent, '拒绝原因: 最长休眠时间');
         continue;
       }
-      if (!firstClient) {
+
+      //RSS任务名包含"test"开启首选下载器调整，寻找可用下载器里有相同大小的种子，并将此下载器设为首选
+      let sizeClient;
+      if (this._rss.alias.includes('test')) {
+        for (const client of availableClients) {
+          for (const _torrent of client.maindata.torrents) {
+            if (+_torrent.size === +torrent.size) {
+              sizeClient = client;
+              break;
+            }
+          }
+          if (sizeClient === client) {
+            break;
+          }
+        }
+      }
+      let selectClient;
+      if (sizeClient){
+        selectClient = sizeClient;
+        //logger.info(`首选下载器调整,种子分类：${torrent.category},原下载器:${firstClient.alias},新下载器sizeClient,种子名称：${sizeClient.alias}`);
+        logger.sc(this._rss.alias,`首选下载器调整,原下载器:${firstClient.alias},新下载器:${sizeClient.alias} \n 种子名称：${torrent.name}\n`);
+      }else{
+        selectClient = firstClient;
+      }
+
+
+      if (!selectClient) {
         await util.runRecord('INSERT INTO torrents (hash, name, size, rss_id, link, record_time, record_type, record_note) values (?, ?, ?, ?, ?, ?, ?, ?)',
           [torrent.hash, torrent.name, torrent.size, this.id, torrent.link, moment().unix(), 2, '拒绝原因: 无可用下载器']);
         await this.ntf.rejectTorrent(this._rss, undefined, torrent, '拒绝原因: 无可用下载器');
@@ -428,7 +454,7 @@ class Rss {
         }
       }
       if (!reject) {
-        await this._pushTorrent(torrent, firstClient);
+        await this._pushTorrent(torrent, selectClient);
       }
     }
     this.lastRssTime = moment().unix();
