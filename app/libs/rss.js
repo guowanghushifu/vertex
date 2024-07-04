@@ -41,7 +41,7 @@ const _getRssContent = async function (rssUrl, suffix = true) {
       body = '<?xml version="1.0" encoding="utf-8"?>\n' + res.body.match(/<rss[\s\S]*<\/rss>/)[0];
     }
     const host = new URL(rssUrl).host;
-    let cacheTime = ['lemon', 'hhanclub'].some(item => host.indexOf(item) !== -1) ? 150 : 40;
+    let cacheTime = ['lemon', 'hhanclub'].some(item => host.indexOf(item) !== -1) ? 150 : 15;
     if (host.indexOf('sharkpt') !== -1) {
       cacheTime = 310;
     }
