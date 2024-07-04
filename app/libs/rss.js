@@ -45,6 +45,7 @@ const _getRssContent = async function (rssUrl, suffix = true) {
     if (host.indexOf('sharkpt') !== -1) {
       cacheTime = 310;
     }
+    logger.info(`刷新RSS: [主机] ${host} - [缓存时间] ${cacheTime}s `);
     await redis.setWithExpire(`vertex:rss:${rssUrl}`, body, isHTML ? 310 : cacheTime);
   }
   return body;
