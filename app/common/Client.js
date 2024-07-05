@@ -362,7 +362,7 @@ class Client {
   async reannounceTorrent (torrent) {
     try {
       await this.client.reannounceTorrent(this.clientUrl, this.cookie, torrent.hash);
-      if (global.enableInfoLog == true) {
+      if (global.enableInfoLog === true) {
         logger.info('下载器', this.alias, '重新汇报种子成功:', torrent.name);
       }
       this.ntf.reannounceTorrent(this._client, torrent);
