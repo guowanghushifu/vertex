@@ -6,6 +6,7 @@ on:
     - dev
     - stable
     - release
+    - mod
 
 jobs:
   build_docker_image:
