@@ -10,6 +10,9 @@ const path = require('path');
 const moment = require('moment');
 const Push = require('./Push');
 
+// HZC到达15TB上传之后，就不再添加猫站的种子
+global.avoidBanLimit = 15 * 1024 * 1024 * 1024 * 1024;
+
 class Rss {
   constructor (rss) {
     this._rss = rss;
@@ -395,7 +398,7 @@ class Rss {
           (!this.maxClientUploadSpeed || this.maxClientUploadSpeed > item.avgUploadSpeed) &&
           (!this.maxClientDownloadSpeed || this.maxClientDownloadSpeed > item.avgDownloadSpeed) &&
           (!this.maxClientDownloadCount || this.maxClientDownloadCount > item.maindata.leechingCount) &&
-          (!this.alias.includes('PTER') || !item.alias.includes('HZC') || item.maindata.allTimeUpload < 15 * 1024 * 1024 * 1024 * 1024);
+          (!this.alias.includes('PTER') || !item.alias.includes('HZC') || item.maindata.allTimeUpload < global.avoidBanLimit);
       });
     const firstClient = availableClients
       .filter(item => {
