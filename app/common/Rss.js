@@ -395,7 +395,7 @@ class Rss {
           (!this.maxClientUploadSpeed || this.maxClientUploadSpeed > item.avgUploadSpeed) &&
           (!this.maxClientDownloadSpeed || this.maxClientDownloadSpeed > item.avgDownloadSpeed) &&
           (!this.maxClientDownloadCount || this.maxClientDownloadCount > item.maindata.leechingCount) &&
-          (!this.alias.includes("PTER") || !item.alias.includes("HZC") || item.maindata.allTimeUpload < 15 * 1024 * 1024 * 1024 * 1024);
+          (!this.alias.includes('PTER') || !item.alias.includes('HZC') || item.maindata.allTimeUpload < 15 * 1024 * 1024 * 1024 * 1024);
       });
     const firstClient = availableClients
       .filter(item => {
