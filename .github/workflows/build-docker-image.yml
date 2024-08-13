@@ -6,6 +6,7 @@ on:
     - dev
     - stable
     - release
+    - mod
 
 jobs:
   build_docker_image:
@@ -24,22 +25,16 @@ jobs:
         CI_COMMIT_MESSAGE=`echo $CI_COMMIT_MESSAGE | sed 's/\n//g'`
         CI_COMMIT_BRANCH=$GITHUB_REF_NAME
         CI_COMMIT_TIMESTAMP="${{ github.event.head_commit.timestamp }}"
-        KEY="${{ secrets.KEY }}"
         PUSH_TIME=$(TZ=Asia/Shanghai date -d $CI_COMMIT_TIMESTAMP "+%Y-%m-%d %H:%M:%S")
         echo "PUSH_TIME=$PUSH_TIME" >> $GITHUB_ENV
         echo "CI_COMMIT_MESSAGE=$CI_COMMIT_MESSAGE" >> $GITHUB_ENV
         echo "CI_COMMIT_BRANCH=$CI_COMMIT_BRANCH" >> $GITHUB_ENV
         echo "CI_COMMIT_SHA=${{ github.event.head_commit.id }}" >> $GITHUB_ENV
-        echo "IMAGE_TAG_LATEST=lswl/vertex:latest" >> $GITHUB_ENV
+        echo "IMAGE_TAG_LATEST=guowanghushifu/vertex:latest" >> $GITHUB_ENV
         echo "DOCKER_BUILDKIT=1" >> $GITHUB_ENV
-        echo "IMAGE_TAG_BRANCH=lswl/vertex:$CI_COMMIT_BRANCH" >> $GITHUB_ENV
+        echo "IMAGE_TAG_BRANCH=guowanghushifu/vertex:$CI_COMMIT_BRANCH" >> $GITHUB_ENV
         echo "PUSH_TIME=$PUSH_TIME" >> $GITHUB_ENV
-        echo "KEY=$KEY" >> $GITHUB_ENV
-    - name: Push Start Message
-      run: |
-        curl --location --request POST 'https://vertex-push.lswl.workers.dev' \
-          --header 'Content-Type: application/json' \
-          --data-raw "{\"key\": \"$KEY\",\"time\": \"$PUSH_TIME\",\"message\": \"$CI_COMMIT_MESSAGE\",\"branch\": \"$CI_COMMIT_BRANCH\",\"sha1\": \"${CI_COMMIT_SHA:0:12}\", \"type\": \"start\"}"
+
     - name: Install Dependencies
       run: |
         npm i --save-dev
@@ -95,9 +90,5 @@ jobs:
       working-directory: ./docker
       run: |
         docker buildx build --platform linux/amd64,linux/arm64 --cache-from lswl/vertex --tag $IMAGE_TAG_LATEST --build-arg BUILDKIT_INLINE_CACHE=1 . --push
-        docker buildx build --platform linux/amd64,linux/arm64 --cache-from lswl/vertex --tag $IMAGE_TAG_BRANCH --build-arg BUILDKIT_INLINE_CACHE=1 . --push
-    - name: Push Finish Message
-      run: |
-        curl --location --request POST 'https://vertex-push.lswl.workers.dev' \
-          --header 'Content-Type: application/json' \
-          --data-raw "{\"key\": \"$KEY\",\"time\": \"$PUSH_TIME\",\"message\": \"$CI_COMMIT_MESSAGE\",\"branch\": \"$CI_COMMIT_BRANCH\",\"sha1\": \"${CI_COMMIT_SHA:0:12}\"}"
+        #docker buildx build --platform linux/amd64,linux/arm64 --cache-from lswl/vertex --tag $IMAGE_TAG_BRANCH --build-arg BUILDKIT_INLINE_CACHE=1 . --push
+    
