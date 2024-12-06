@@ -21,7 +21,9 @@ const _getRssContent = async function (rssUrl, suffix = true) {
     body = cache;
   } else {
     let url = rssUrl;
-    if (suffix) {
+    const isPig = rssUrl.includes('https://piggo.me/');
+    const isKamept = rssUrl.includes('https://kamept.com/');
+    if (suffix && !isPig && !isKamept) {
       url += (rssUrl.indexOf('?') === -1 ? '?' : '&') + '____=' + Math.random();
     }
     let res;
@@ -302,7 +304,7 @@ const _getTorrentsTorrentDB = async function (rssUrl) {
   return torrents;
 };
 
-const _getTorrentsEmpornium = async function (rssUrl) {
+const _getTorrentsLuminance = async function (rssUrl) {
   const rss = await parseXml(await _getRssContent(rssUrl));
   const torrents = [];
   const items = rss.rss.channel[0].item;
@@ -320,26 +322,11 @@ const _getTorrentsEmpornium = async function (rssUrl) {
     torrent.link = link;
     torrent.id = link.substring(link.indexOf('?id=') + 4);
     torrent.url = items[i].enclosure[0].$.url;
-    const cache = await redis.get(`vertex:hash:${torrent.url}`);
-    if (cache) {
-      const _torrent = JSON.parse(cache);
-      torrent.hash = _torrent.hash;
-      torrent.size = _torrent.size;
-    } else {
-      try {
-        const { hash, size } = await exports.getTorrentNameByBencode(torrent.url);
-        torrent.hash = hash;
-        torrent.size = size;
-        await redis.set(`vertex:hash:${torrent.url}`, JSON.stringify(torrent));
-      } catch (e) {
-        await redis.set(`vertex:hash:${torrent.url}`, JSON.stringify({ hash: 'emp' + moment().unix() + 'emp', size: 0 }));
-        throw e;
-      }
-    }
+    torrent.hash = items[i].torrent[0].infoHash[0];
+    torrent.size = items[i].torrent[0].contentLength[0];
     torrent.pubTime = moment(items[i].pubDate[0]).unix();
     torrents.push(torrent);
   }
-
   return torrents;
 };
 
@@ -605,7 +592,7 @@ const _getTorrentsLearnFlakes = async function (rssUrl) {
   return torrents;
 };
 
-const _getTorrentsExoticaZ = async function (rssUrl) {
+const _getTorrentsAvistaZ = async function (rssUrl) {
   const rss = await parseXml(await _getRssContent(rssUrl));
   const torrents = [];
   const items = rss.rss.channel[0].item;
@@ -797,6 +784,33 @@ const _getTorrentsFappaizuri = async function (rssUrl) {
   return torrents;
 };
 
+const _getTorrentsLusthive = async function (rssUrl) {
+  const rss = await parseXml(await _getRssContent(rssUrl));
+  const torrents = [];
+  const items = rss.rss.channel[0].item;
+  for (let i = 0; i < items.length; ++i) {
+    const torrent = {
+      size: 0,
+      name: '',
+      hash: '',
+      id: 0,
+      url: '',
+      link: ''
+    };
+    torrent.size = items[i].torrent[0].contentLength[0];
+    torrent.name = items[i].title[0];
+    const link = items[i].link[0];
+    torrent.link = link;
+    torrent.description = items[i].description ? items[i].description[0] : '';
+    torrent.id = link.substring(link.indexOf('?id=') + 4);
+    torrent.url = items[i].enclosure[0].$.url;
+    torrent.hash = items[i].guid[0]._ || items[i].guid[0];
+    torrent.pubTime = moment(items[i].pubDate[0]).unix();
+    torrents.push(torrent);
+  }
+  return torrents;
+};
+
 const _getTorrentsWrapper = {
   'filelist.io': _getTorrentsFileList,
   'blutopia.cc': _getTorrentsUnit3D2,
@@ -805,7 +819,10 @@ const _getTorrentsWrapper = {
   'kimoji.club': _getTorrentsKimoji,
   'torrentdb.net': _getTorrentsTorrentDB,
   'uhdbits.org': _getTorrentsGazelle,
-  'www.empornium.is': _getTorrentsEmpornium,
+  'www.empornium.is': _getTorrentsLuminance,
+  'www.empornium.sx': _getTorrentsLuminance,
+  'www.pixelcove.me': _getTorrentsLuminance,
+  'www.cathode-ray.tube': _getTorrentsLuminance,
   'www.skyey2.com': _getTorrentsSkyeySnow,
   'hdbits.org': _getTorrentsHDBits,
   'beyond-hd.me': _getTorrentsBeyondHD,
@@ -815,20 +832,22 @@ const _getTorrentsWrapper = {
   'iptorrents.com': _getTorrentsIPTorrents,
   'mikanani.me': _getTorrentsMikanProject,
   'learnflakes.net': _getTorrentsLearnFlakes,
-  'exoticaz.to': _getTorrentsExoticaZ,
-  'avistaz.to': _getTorrentsExoticaZ,
-  'cinemaz.to': _getTorrentsExoticaZ,
-  'privatehd.to': _getTorrentsExoticaZ,
+  'exoticaz.to': _getTorrentsAvistaZ,
+  'avistaz.to': _getTorrentsAvistaZ,
+  'cinemaz.to': _getTorrentsAvistaZ,
+  'privatehd.to': _getTorrentsAvistaZ,
   'rss.torrentleech.org': _getTorrentsTorrentLeech,
   'rss24h.torrentleech.org': _getTorrentsTorrentLeech,
   'fsm.name': _getTorrentsFSM,
+  'api.fsm.name': _getTorrentsFSM,
   'www.happyfappy.org': _getTorrentsHappyFappy,
   'fearnopeer.com': _getTorrentsUnit3D2,
   'jpopsuki.eu': _getTorrentsGazelle,
   'dicmusic.com': _getTorrentsGazelle,
   'greatposterwall.com': _getTorrentsGazelle,
   'libble.me': _getTorrentsGazelle,
-  'fappaizuri.me': _getTorrentsFappaizuri
+  'fappaizuri.me': _getTorrentsFappaizuri,
+  'lusthive.org': _getTorrentsLusthive
 };
 
 exports.getTorrents = async function (rssUrl) {
