@@ -605,6 +605,12 @@ class Client {
     }
   }
 
+  async recheckTorrent (hash) {
+    if (this._client.type === 'qBittorrent') {
+      await this.client.recheckTorrent(this.clientUrl, this.cookie, hash);
+    }
+  }
+
   async pauseTorrent (hash) {
     if (this._client.type === 'qBittorrent') {
       await this.client.pauseTorrent(this.clientUrl, this.cookie, hash);

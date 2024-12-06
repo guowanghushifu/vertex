@@ -148,6 +148,21 @@ exports.resumeTorrent = async (clientUrl, cookie, hash) => {
   return res;
 };
 
+exports.recheckTorrent = async (clientUrl, cookie, hash) => {
+  const message = {
+    url: clientUrl + '/api/v2/torrents/recheck',
+    method: 'POST',
+    headers: {
+      cookie
+    },
+    formData: {
+      hashes: hash
+    }
+  };
+  const res = await util.requestPromise(message);
+  return res;
+};
+
 exports.pauseTorrent = async (clientUrl, cookie, hash) => {
   const message = {
     url: clientUrl + '/api/v2/torrents/pause',
