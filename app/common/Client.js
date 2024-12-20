@@ -401,6 +401,22 @@ class Client {
     return isDeleteFiles;
   };
 
+  async directDeleteTorrent (torrent) {
+    let isDeleteFiles = true;
+    try {
+      for (const _torrent of this.maindata.torrents) {
+        if (_torrent.name === torrent.name && _torrent.size === torrent.size && _torrent.hash !== torrent.hash && _torrent.savePath === torrent.savePath) {
+          isDeleteFiles = false;
+        }
+      }
+
+      await this.client.deleteTorrent(this.clientUrl, this.cookie, torrent.hash, isDeleteFiles);
+      logger.info('下载器', this.alias, ' 删除种子成功:', torrent.name);
+    } catch (error) {
+      logger.error('下载器', this.alias, ' 删除种子失败:', torrent.name, error);
+    }
+  }
+
   async autoReannounce () {
     if (!this.maindata) return;
     logger.debug(this.alias, moment().format(), '启动重新汇报任务');
@@ -611,13 +627,13 @@ class Client {
     }
   }
 
-  async getTorrentTrackerStatus (hash) {
+  async getTorrentTrackerStatus (torrent) {
     try {
-      const { statusCode, body } = await this.client.getTrackerList(this.clientUrl, this.cookie, hash);
+      const { statusCode, body } = await this.client.getTrackerList(this.clientUrl, this.cookie, torrent.hash);
 
       // 处理 404 情况
       if (statusCode === 404) {
-        logger.debug('下载器', this.alias, '种子 hash:', hash, 'tracker 状态同步 404');
+        logger.error('下载器', this.alias, ' 种子名称:', torrent.name, ' 种子 hash:', torrent.hash, ' tracker 状态同步 404');
         return '';
       }
       // 处理其他非 200 状态码
@@ -635,7 +651,7 @@ class Client {
 
       return trackerStatus;
     } catch (e) {
-      logger.error('下载器', this.alias, '种子 hash:', hash, 'tracker 状态同步失败, 报错如下:\n', e);
+      logger.error('下载器', this.alias, ' 种子名称:', torrent.name, ' 种子 hash:', torrent.hash, ' tracker 状态同步失败, 报错如下:\n', e);
       return '';
     }
   }
