@@ -611,6 +611,37 @@ class Client {
     }
   }
 
+  async getTorrentTrackerStatus (hash) {
+    try {
+      const { statusCode, body } = await this.client.getTrackerList(this.clientUrl, this.cookie, hash);
+
+      // 处理 404 情况
+      if (statusCode === 404) {
+        logger.debug('下载器', this.alias, '种子 hash:', hash, 'tracker 状态同步 404');
+        return '';
+      }
+      // 处理其他非 200 状态码
+      if (statusCode !== 200) {
+        return '';
+      }
+
+      const trackerList = JSON.parse(body);
+      // 过滤掉包含 ** 的 tracker 并获取所有错误消息
+      const trackerStatus = trackerList
+        .filter(i => i.url.indexOf('**') === -1)
+        .map(i => i.msg)
+        .filter(msg => msg && msg.length > 0)  // 只保留非空消息
+        .join('; ');
+
+      return trackerStatus;  // 返回错误消息或空字符串
+
+    } catch (e) {
+      logger.error('下载器', this.alias, '种子 hash:', hash, 'tracker 状态同步失败, 报错如下:\n', e);
+      return '';
+    }
+  }
+
+
   async pauseTorrent (hash) {
     if (this._client.type === 'qBittorrent') {
       await this.client.pauseTorrent(this.clientUrl, this.cookie, hash);
