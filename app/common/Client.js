@@ -634,7 +634,6 @@ class Client {
         .join('; ');
 
       return trackerStatus;
-
     } catch (e) {
       logger.error('下载器', this.alias, '种子 hash:', hash, 'tracker 状态同步失败, 报错如下:\n', e);
       return '';
