@@ -630,17 +630,16 @@ class Client {
       const trackerStatus = trackerList
         .filter(i => i.url.indexOf('**') === -1)
         .map(i => i.msg)
-        .filter(msg => msg && msg.length > 0)  // 只保留非空消息
+        .filter(msg => msg && msg.length > 0)
         .join('; ');
 
-      return trackerStatus;  // 返回错误消息或空字符串
+      return trackerStatus;
 
     } catch (e) {
       logger.error('下载器', this.alias, '种子 hash:', hash, 'tracker 状态同步失败, 报错如下:\n', e);
       return '';
     }
   }
-
 
   async pauseTorrent (hash) {
     if (this._client.type === 'qBittorrent') {
