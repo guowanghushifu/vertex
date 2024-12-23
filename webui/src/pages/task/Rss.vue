@@ -440,7 +440,7 @@ export default {
         enable: false,
         scrapeFree: false,
         scrapeHr: false,
-        autoReseed: false,
+        autoReseed: true,
         onlyReseed: false,
         maxSleepTime: 600,
         skipSameTorrent: true,
