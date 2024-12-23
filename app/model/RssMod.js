@@ -8,6 +8,8 @@ class RssMod {
     const id = util.uuid.v4().split('-')[0];
     const rssSet = { ...options };
     rssSet.id = id;
+    rssSet.autoReseed = true;
+    rssSet.reseedClients = rssSet.clientArr || [];
     fs.writeFileSync(path.join(__dirname, '../data/rss/', id + '.json'), JSON.stringify(rssSet, null, 2));
     if (global.runningRss[id]) global.runningRss[id].destroy();
     if (rssSet.enable) global.runningRss[id] = new Rss(rssSet);
@@ -27,6 +29,7 @@ class RssMod {
 
   modify (options) {
     const rssSet = { ...options };
+    rssSet.autoReseed = true;
     rssSet.sameServerClients = rssSet.sameServerClients || [];
     rssSet.reseedClients = rssSet.clientArr || [];
     fs.writeFileSync(path.join(__dirname, '../data/rss/', options.id + '.json'), JSON.stringify(rssSet, null, 2));
