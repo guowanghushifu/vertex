@@ -160,6 +160,20 @@
           <a-checkbox v-model:checked="rss.scrapeHr">排除 HR</a-checkbox>
         </a-form-item>
         <a-form-item
+          label="自动辅种"
+          name="autoReseed"
+          extra="优先将种子分配给：已经下载了相同内容种子且进度达到100%的下载器"
+          :rules="[{ required: true, message: '${label}不可为空! ' }]">
+          <a-checkbox v-model:checked="rss.autoReseed">自动辅种</a-checkbox>
+        </a-form-item>
+        <a-form-item
+          label="仅仅辅种"
+          name="onlyReseed"
+          extra="只辅种，凡是需要下载数据的种子不会添加"
+          :rules="[{ required: true, message: '${label}不可为空! ' }]">
+          <a-checkbox v-model:checked="rss.onlyReseed">仅仅辅种</a-checkbox>
+        </a-form-item>
+        <a-form-item
           label="Cookie"
           v-if="rss.scrapeHr || rss.scrapeFree"
           name="cookie"
