@@ -474,7 +474,7 @@ class Client {
           await util.sleep(2000);
           logger.info(torrent.name, '等待 2s 完毕, 执行删种');
           await util.runRecord('update torrents set size = ?, tracker = ?, upload = ?, download = ?, delete_time = ?, record_note = ? where hash = ?',
-            [torrent.size, torrent.tracker, torrent.uploaded, torrent.downloaded, moment().unix(), `删种规则: ${rule.alias}`, torrent.hash]);
+            [torrent.size, torrent.tracker, torrent.uploaded, torrent.downloaded, moment().unix(), `下载器: ${this.alias}/删种规则: ${rule.alias}`, torrent.hash]);
           await util.runRecord('insert into torrent_flow (hash, upload, download, time) values (?, ?, ?, ?)',
             [torrent.hash, torrent.uploaded, torrent.downloaded, moment().unix()]);
           const deleteFiles = await this.deleteTorrent(torrent, rule);
