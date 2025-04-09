@@ -213,14 +213,18 @@ class Rss {
           continue;
         }
         for (const _torrent of client.maindata.torrents) {
-          if (+_torrent.size === +torrent.size && +_torrent.completed === +_torrent.size) {
+          if (+_torrent.size === +torrent.size) {
+            let addReason = '优先加种到：' + client.alias;
+            if (+_torrent.completed === +_torrent.size) {
+              addReason = '辅种到：' + client.alias;
+            }
             const bencodeInfo = await rss.getTorrentNameByBencode(torrent.url);
             if (_torrent.name === bencodeInfo.name && _torrent.hash !== bencodeInfo.hash) {
               try {
                 this.addCount += 1;
                 await client.addTorrent(torrent.url, torrent.hash, true, this.uploadLimit, this.downloadLimit, _torrent.savePath, this.category);
                 await util.runRecord('INSERT INTO torrents (hash, name, size, rss_id, category, link, record_time, add_time, record_type, record_note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                  [torrent.hash, torrent.name, torrent.size, this.id, this.category, torrent.link, moment().unix(), moment().unix(), 1, '辅种']);
+                  [torrent.hash, torrent.name, torrent.size, this.id, this.category, torrent.link, moment().unix(), moment().unix(), 1, addReason]);
                 await this.ntf.addTorrent(this._rss, client, torrent);
                 return;
               } catch (error) {
