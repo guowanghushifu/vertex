@@ -214,6 +214,11 @@ class Rss {
         }
         for (const _torrent of client.maindata.torrents) {
           if (+_torrent.size === +torrent.size) {
+            // 如果开启了仅仅辅种，就需要限制有相同内容的种子而且进度100%才添加
+            if (this.onlyReseed && +_torrent.completed != +_torrent.size) {
+              continue;
+            }
+            
             let addReason = '优先加种到：' + client.alias;
             if (+_torrent.completed === +_torrent.size) {
               addReason = '辅种到：' + client.alias;
