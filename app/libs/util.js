@@ -85,9 +85,10 @@ exports.requestPromise = async function (_options, usePuppeteer = true) {
   if (!options.headers) {
     options.headers = {};
   };
+  options.family = 4;
   options.headers['User-Agent'] = global.userAgent || 'Vertex';
   if (!options.timeout) {
-    options.timeout = 120000;
+    options.timeout = 25000;
   }
   if (global.proxy) {
     const host = new URL(options.url).host;
