@@ -140,4 +140,4 @@ Xvfb -ac :99 -screen 0 1280x1024x16 &
 export DISPLAY=:99
 cp /usr/share/zoneinfo/$TZ /app/localtime
 /usr/bin/redis-server /app/redis.conf --port $REDISPORT
-su vt -c 'cd /app/vertex && node app/app.js > /dev/null'
+su vt -c 'cd /app/vertex && node --dns-result-order=ipv4first app/app.js > /dev/null'
