@@ -12,6 +12,8 @@ const Push = require('./Push');
 
 // HZC到达15TB上传之后，就不再添加猫站的种子
 global.avoidBanLimit = 15 * 1024 * 1024 * 1024 * 1024;
+global.oneGBFileUplimitRatio = 0.8;
+global.twoGBFileUplimitRatio = 0.9;
 
 class Rss {
   constructor (rss) {
@@ -205,6 +207,13 @@ class Rss {
   }
 
   async _pushTorrent (torrent, _client) {
+    // 如果种子的体积比较小，按比例下调上传限速
+    let finalUploadLimit = this.uploadLimit;
+    if (torrent.size < 1 * 1024 * 1024 * 1024) {
+        finalUploadLimit = global.oneGBFileUplimitRatio * finalUploadLimit;
+    } else if (torrent.size < 2 * 1024 * 1024 * 1024) {
+        finalUploadLimit = global.twoGBFileUplimitRatio * finalUploadLimit;
+    }
     if (this.autoReseed && torrent.hash.indexOf('fakehash') === -1) {
       for (const key of this.reseedClients) {
         const client = global.runningClient[key];
@@ -227,7 +236,7 @@ class Rss {
             if (_torrent.name === bencodeInfo.name && _torrent.hash !== bencodeInfo.hash) {
               try {
                 this.addCount += 1;
-                await client.addTorrent(torrent.url, torrent.hash, true, this.uploadLimit, this.downloadLimit, _torrent.savePath, this.category);
+                await client.addTorrent(torrent.url, torrent.hash, true, finalUploadLimit, this.downloadLimit, _torrent.savePath, this.category);
                 await util.runRecord('INSERT INTO torrents (hash, name, size, rss_id, category, link, record_time, add_time, record_type, record_note) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                   [torrent.hash, torrent.name, torrent.size, this.id, this.category, torrent.link, moment().unix(), moment().unix(), 1, addReason]);
                 await this.ntf.addTorrent(this._rss, client, torrent);
@@ -362,17 +371,17 @@ class Rss {
         if (this.pushTorrentFile) {
           const { filepath, hash } = await this._downloadTorrent(torrent.url, torrent.hash);
           truehash = hash;
-          await client.addTorrentByTorrentFile(filepath, hash, false, this.uploadLimit, this.downloadLimit, savePath, category, this.autoTMM, this.paused);
+          await client.addTorrentByTorrentFile(filepath, hash, false, finalUploadLimit, this.downloadLimit, savePath, category, this.autoTMM, this.paused);
         } else {
           if (this.useCustomRegex) {
             const match = this.regexStr.match(/^\/(.*)\/([gimuy]*)$/);
             if (match) {
               const [, pattern, flags] = match;
               const regex = new RegExp(pattern, flags);
-              await client.addTorrent(torrent.url.replace(regex, this.replaceStr), torrent.hash, false, this.uploadLimit, this.downloadLimit, savePath, category, this.autoTMM, this.paused);
+              await client.addTorrent(torrent.url.replace(regex, this.replaceStr), torrent.hash, false, finalUploadLimit, this.downloadLimit, savePath, category, this.autoTMM, this.paused);
             }
           } else {
-            await client.addTorrent(torrent.url, torrent.hash, false, this.uploadLimit, this.downloadLimit, savePath, category, this.autoTMM, this.paused);
+            await client.addTorrent(torrent.url, torrent.hash, false, finalUploadLimit, this.downloadLimit, savePath, category, this.autoTMM, this.paused);
           }
         }
         try {

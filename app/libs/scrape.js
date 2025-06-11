@@ -177,6 +177,16 @@ const _freeBitPorn = async function (url, cookie) {
   return state;
 };
 
+const _freeHDCity = async function (url, cookie) {
+  const d = await getDocument(url, cookie);
+  if (d.body.innerHTML.indexOf('userdetails') === -1) {
+    throw new Error('疑似登录状态失效, 请检查 Cookie');
+  }
+  const state = d.querySelector('font.free') ||
+    d.querySelector('font.twoupfree');
+  return state;
+};
+
 const _freeLuminance = async function (url, cookie) {
   const d = await getDocument(url, cookie);
   if (d.body.innerHTML.indexOf('nav_userinfo') === -1) {
@@ -192,6 +202,7 @@ const freeWrapper = {
   'hdhome.org': _free,
   'springsunday.net': _free,
   'hdsky.me': _free,
+  'hdsky.my': _free,
   'ourbits.club': _free,
   'chdbits.co': _free,
   'ptchdbits.co': _free,
@@ -226,6 +237,8 @@ const freeWrapper = {
   'hudbt.hust.edu.cn': _freeHUDBT,
   'bitporn.eu': _freeBitPorn,
   'pt.sjtu.edu.cn': _freePuTao,
+  'hdcity.leniter.org': _freeHDCity,
+  'hdcity.city': _freeHDCity,
   'www.empornium.is': _freeLuminance,
   'www.empornium.sx': _freeLuminance,
   'www.pixelcove.me': _freeLuminance,
