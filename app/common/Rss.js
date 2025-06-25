@@ -436,15 +436,12 @@ class Rss {
           if (this.clientSortBy === 'freeSpaceOnDisk') {
             return b.maindata.freeSpaceOnDisk - a.maindata.freeSpaceOnDisk;
           }
-          
           // 否则先按照 this.clientSortBy 排序
           const primarySort = a.maindata[this.clientSortBy] - b.maindata[this.clientSortBy];
-          
           // 如果第一个排序条件相等，则按照 freeSpaceOnDisk 排序（降序，剩余空间大的优先）
           if (primarySort === 0) {
             return b.maindata.freeSpaceOnDisk - a.maindata.freeSpaceOnDisk;
           }
-          
           return primarySort;
         })[0] || availableClients[0];
       const sqlRes = await util.getRecord('SELECT * FROM torrents WHERE hash = ? AND rss_id = ?', [torrent.hash, this.id]);
