@@ -209,10 +209,12 @@ class Rss {
   async _pushTorrent (torrent, _client) {
     // 如果种子的体积比较小，按比例下调上传限速
     let finalUploadLimit = this.uploadLimit;
-    if (torrent.size < 1 * 1024 * 1024 * 1024) {
-      finalUploadLimit = global.oneGBFileUplimitRatio * finalUploadLimit;
-    } else if (torrent.size < 2 * 1024 * 1024 * 1024) {
-      finalUploadLimit = global.twoGBFileUplimitRatio * finalUploadLimit;
+    if (this.uploadLimit > 90 * 1024 * 1024) {
+      if (torrent.size < 1 * 1024 * 1024 * 1024) {
+        finalUploadLimit = Math.floor(global.oneGBFileUplimitRatio * finalUploadLimit);
+      } else if (torrent.size < 2 * 1024 * 1024 * 1024) {
+        finalUploadLimit = Math.floor(global.twoGBFileUplimitRatio * finalUploadLimit);
+      }
     }
     if (this.autoReseed && torrent.hash.indexOf('fakehash') === -1) {
       for (const key of this.reseedClients) {
