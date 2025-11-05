@@ -372,6 +372,14 @@ class Client {
     }
   };
 
+  async limitTorrentUpSpeed (torrent, speedLimit) {
+    try {
+      await this.setSpeedLimit(torrent.hash, 'upload', speedLimit);
+    } catch (error) {
+      logger.error('下载器', this.alias, '限制种子上传速度失败:', torrent.name, '\n', error.message);
+    }
+  };
+
   async deleteTorrent (torrent, rule) {
     let isDeleteFiles = true;
     try {
