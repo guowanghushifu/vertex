@@ -130,7 +130,8 @@ module.exports = function (app, express, router) {
     store: new RedisStore(redisConfig),
     secret: 'sses:xetrev',
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 30
+      maxAge: 1000 * 60 * 60 * 24 * 30,
+      sameSite: 'lax'
     }
   }));
   app.use('/api', express.text({ type: 'text/xml' }));

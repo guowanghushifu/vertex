@@ -1,13 +1,24 @@
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const logger = require('../libs/logger');
 
 class LogMod {
   get (options) {
-    const logFile = path.join(__dirname, `../../logs/app-${options.type}.log`);
-    const log = execSync(`tail -n 2000 ${logFile}`).toString();
-    return log;
+    if (['error', 'info', 'debug', 'watch', 'watchdebug', 'binge', 'bingedebug', 'advanceddebug', 'advanced', 'scdebug', 'sc'].includes(options.type)) {
+      try {
+        const logFile = path.join(__dirname, `../../logs/app-${options.type}.log`);
+        if (!fs.existsSync(logFile)) {
+          return '日志文件尚不存在';
+        }
+        const log = spawnSync('tail', ['-n', '2000', logFile]);
+        return log.stdout.toString();
+      } catch (e) {
+        logger.error(e);
+        return '读取日志时发生错误';
+      }
+    }
+    return '不支持的日志类型';
   };
 
   clear () {

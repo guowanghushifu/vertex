@@ -1,6 +1,7 @@
 const util = require('../libs/util');
 const logger = require('../libs/logger');
 const path = require('path');
+const { spawnSync } = require('child_process');
 
 class TorrentMod {
   async list (options) {
@@ -557,11 +558,12 @@ class TorrentMod {
     for (const file of options.files) {
       const { server, filepath } = file;
       try {
-        logger.info(global.runningServer[server].server.alias, '执行删除文件命令:', `rm -f $'${filepath}'`);
+        const _filepath = filepath.replace(/'/g, '\\\'');
+        logger.info(global.runningServer[server].server.alias, '执行删除文件命令:', `rm -f $'${_filepath}'`);
         if (server === '$local') {
-          await util.exec(`rm -f $'${filepath}'`);
+          spawnSync('rm', ['-f', filepath]);
         } else {
-          await global.runningServer[server].run(`rm -f $'${filepath}'`);
+          await global.runningServer[server].run(`rm -f $'${_filepath}'`);
         }
       } catch (e) {
         isError = true;
