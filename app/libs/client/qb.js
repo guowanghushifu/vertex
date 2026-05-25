@@ -24,7 +24,7 @@ exports.login = async function (username, clientUrl, password) {
   if (res.body.indexOf('Fails') !== -1) {
     throw new Error('password is wrong!');
   }
-  if (res.statusCode !== 200) {
+  if (res.statusCode !== 200 && res.statusCode !== 204) {
     throw new Error('StatusCode is ' + res.statusCode);
   }
 };
